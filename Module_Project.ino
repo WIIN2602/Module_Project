@@ -34,7 +34,7 @@ void setup() {
 }
 
 void loop() {
-  if(WiFi.status() != WL_CONNECTED) {
+  if (WiFi.status() != WL_CONNECTED) {
     connectWiFi();
   }
 
@@ -47,27 +47,23 @@ void loop() {
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
   int httpCode = http.POST(postData);
-  String payload = "";
+  String payload = http.getString();
 
-  if(httpCode > 0) {
-    if(httpCode == HTTP_CODE_OK) {
-      payload = http.getString();
-      Serial.println(payload);
-    } else {
-      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-    }
-  } else {
-    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-  }
-  http.end();
   Serial.print("URL : "); Serial.println(URL);
   Serial.print("Data: "); Serial.println(postData);
   Serial.print("httpCode: "); Serial.println(httpCode);
   Serial.print("payload : "); Serial.println(payload);
   Serial.println("--------------------------------------------------");
 
+  if (httpCode != 200) {
+    Serial.print("Error in HTTP request, code: "); Serial.println(httpCode);
+  }
+
+  http.end();
+
   delay(5000);
 }
+
 
 void connectWiFi() {
   WiFi.mode(WIFI_STA);
