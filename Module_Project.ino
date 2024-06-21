@@ -12,7 +12,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 Servo myServo;
 
-String URL = "http://your_server_ip/store_data/store_data.php";
+String URL = "http://192.168.1.109/store_data.php";
 
 const char* ssid = "your_SSID";
 const char* password = "your_PASSWORD";
@@ -26,11 +26,11 @@ void setup() {
   pinMode(echoPin, INPUT);
   myServo.attach(servoPin);
   myServo.write(0);
-  lcd.init(); 
+  lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("Bottles: 0");
-  connectWiFi(); 
+  connectWiFi();
 }
 
 void loop() {
@@ -45,29 +45,27 @@ void loop() {
   HTTPClient http;
   http.begin(URL);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-  
+
   int httpCode = http.POST(postData);
   String payload = "";
 
   if(httpCode > 0) {
-    // file found at server
     if(httpCode == HTTP_CODE_OK) {
-      String payload = http.getString();
+      payload = http.getString();
       Serial.println(payload);
     } else {
-      // HTTP header has been send and Server response header has been handled
       Serial.printf("[HTTP] GET... code: %d\n", httpCode);
     }
   } else {
     Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
   }
   http.end();
-  Serial.print("URL : "); Serial.println(URL); 
+  Serial.print("URL : "); Serial.println(URL);
   Serial.print("Data: "); Serial.println(postData);
   Serial.print("httpCode: "); Serial.println(httpCode);
   Serial.print("payload : "); Serial.println(payload);
   Serial.println("--------------------------------------------------");
-  
+
   delay(5000);
 }
 
@@ -77,7 +75,7 @@ void connectWiFi() {
   Serial.println("Connecting to WiFi");
 
   unsigned long startAttemptTime = millis();
-  
+
   while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
     delay(500);
     Serial.print(".");
@@ -106,20 +104,20 @@ void Load_data() {
   Serial.println(" cm");
 
   if (distance < 20) {
-    bottle_count++; 
+    bottle_count++;
     myServo.write(90);
-    delay(1000); 
-    myServo.write(0); 
-    delay(1000); 
+    delay(1000);
+    myServo.write(0);
+    delay(1000);
 
     lcd.setCursor(0, 0);
     lcd.print("Bottles: ");
     lcd.print(bottle_count);
-    lcd.print("    "); 
+    lcd.print("    ");
 
     delay(2000);
   }
-  
+
   if (isnan(distance) || isnan(bottle_count)) {
     Serial.println("Failed to read value from sensor!!!");
     distance = 0;
