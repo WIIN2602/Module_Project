@@ -9,18 +9,24 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
 // Check connection
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
+} else {
+    echo "database connection successfully";
 }
 
-if(isset($_POST["distance"]) && isset($_POST["bottle_count"])) {
-    $dis = $_POST["distance"];
-    $count = $_POST["bottle_count"];
+if(isset($_POST["Distance"]) && isset($_POST["Bottle_count"])) {
+    $dis = $_POST["Distance"];
+    $count = $_POST["Bottle_count"];
 
-    $sql = "INSERT INTO bottle_data (distance,bottle_count) VALUES (".$dis.", ".$count.")";
+    $stmt = $conn->prepare("INSERT INTO bottle_data (distance, bottle_count) VALUES (?, ?)");
+    $stmt->bind_param("ii", $dis, $count);
 
-    if (mysqli_query($conn, $sql)) {
+    if ($stmt->execute()) {
         echo "new data created successfully";
     } else {
-        echo "Error: ". $sql ."<br>". mysqli_error($conn);
+        echo "Error: " . $stmt->error;
     }
+
+    $stmt->close();
 }
+$conn->close();
 ?>
